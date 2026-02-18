@@ -1,0 +1,54 @@
+name: evmbench-certora-agent-harness
+
+# EVMBench location after running scripts/fetch_evmbench.sh
+challenge_root: ./datasets/evmbench/audits
+challenge_glob: "*"
+
+context_globs:
+  - "**/*.sol"
+  - "**/*.md"
+  - "**/*.yaml"
+  - "**/*.yml"
+
+max_context_files: 120
+max_context_bytes: 220000
+max_iterations: 6
+
+output_dir: ./runs
+
+objective: >
+  Generate and iteratively refine Certora CVL specs that expose real security
+  violations or prove critical properties. Fix parser/type/config failures quickly.
+
+system_prompt_path: ./prompts/system_prompt.md
+
+llm:
+  provider: openai
+  model: gpt-5-mini
+  temperature: 0.2
+  max_output_tokens: 1800
+  timeout_sec: 120
+  api_key_env: OPENAI_API_KEY
+  # base_url: https://api.openai.com
+
+  # For local Ollama, switch to:
+  # provider: ollama
+  # model: qwen2.5-coder:14b
+  # base_url: http://localhost:11434
+
+  # For plumbing-only smoke tests, switch to:
+  # provider: mock
+
+certora:
+  spec_path: specs/AutoSpec.cvl
+  command_template: certoraRun certora.conf --verify Vault:{spec_path}
+  timeout_sec: 900
+  success_markers:
+    - VERIFICATION SUCCESSFUL
+    - No errors found
+  failure_markers:
+    - VIOLATION
+    - FAILED
+    - ERROR
+    - Exception
+    - Syntax

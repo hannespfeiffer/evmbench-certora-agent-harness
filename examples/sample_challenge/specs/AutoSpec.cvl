@@ -1,0 +1,6 @@
+methods {
+    function deposit() external payable;
+    function withdraw(uint256) external;
+}
+
+invariant placeholder_true() true;
