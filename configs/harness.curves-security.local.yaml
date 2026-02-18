@@ -1,0 +1,46 @@
+name: evmbench-certora-agent-harness-curves-security
+
+challenge_root: /Users/hpagent/Documents/hpagent-vault/10_Experiments/exp07-evmbench-certora-agent-harness/datasets/evmbench/audits
+challenge_glob: "2024-01-curves"
+
+context_globs:
+  - "patch/Security.sol"
+  - "findings/H-05.md"
+  - "config.yaml"
+
+max_context_files: 20
+max_context_bytes: 120000
+max_iterations: 2
+
+output_dir: ../runs
+
+objective: >
+  Create Certora CVL rules for Security.sol that capture owner/manager authorization.
+  Prioritize non-vacuous rules and iterate on syntax/type/prover feedback.
+
+system_prompt_path: ../prompts/system_prompt.curves-security.md
+
+llm:
+  provider: ollama
+  model: mistral-small3.1:24b
+  temperature: 0.1
+  max_output_tokens: 1800
+  timeout_sec: 240
+  base_url: http://127.0.0.1:11434
+
+certora:
+  spec_path: specs/AutoSpec.cvl
+  command_template: >
+    export CERTORA=/Users/hpagent/tools/certora-local &&
+    export PATH="/Users/hpagent/tools/certora-local:/Users/hpagent/bin:/Users/hpagent/.cargo/bin:$PATH" &&
+    python3 /Users/hpagent/tools/certora-local/certoraRun.py patch/Security.sol --verify Security:{spec_path} --solc solc --msg exp07-harness-curves-security
+  timeout_sec: 600
+  success_markers:
+    - Properties successfully verified
+    - SUCCESS
+  failure_markers:
+    - Violated
+    - FAIL
+    - ERROR
+    - Exception
+    - Failed on

@@ -154,6 +154,14 @@ class HarnessRunner:
             workspace_dir = iter_dir / "workspace"
             shutil.copytree(challenge_dir, workspace_dir)
 
+            # Remove stale Certora artifacts copied from source challenge folders.
+            stale_internal = workspace_dir / ".certora_internal"
+            if stale_internal.exists():
+                shutil.rmtree(stale_internal, ignore_errors=True)
+            for stale_report in workspace_dir.glob("emv-*"):
+                if stale_report.is_dir():
+                    shutil.rmtree(stale_report, ignore_errors=True)
+
             user_prompt = self._build_user_prompt(
                 challenge_dir=challenge_dir,
                 context_text=context_text,
@@ -185,10 +193,7 @@ class HarnessRunner:
                 spec_text = "invariant fallback_noop() true;\n"
 
             spec_rel = str(llm_response.payload.get("spec_path", self.config.certora.spec_path))
-            raw_cmd = str(
-                llm_response.payload.get("certora_command", self.config.certora.command_template)
-            )
-            command = raw_cmd.format(spec_path=spec_rel)
+            command = self.config.certora.command_template.format(spec_path=spec_rel)
 
             spec_path = workspace_dir / spec_rel
             spec_path.parent.mkdir(parents=True, exist_ok=True)

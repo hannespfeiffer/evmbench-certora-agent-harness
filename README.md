@@ -3,7 +3,7 @@
 Configurable agent harness for iterative smart-contract spec generation/refinement using:
 - EVMBench-style tasks (`openai/frontier-evals` -> `project/evmbench`)
 - Certora Prover (`Certora/CertoraProver`)
-- LLM backend: OpenAI API, local Ollama, or mock mode
+- LLM backend: OpenAI API, OpenRouter API, local Ollama, or mock mode
 
 ## What this does
 The harness loops over a challenge:
@@ -28,6 +28,7 @@ Run artifacts are persisted for every iteration.
 - Solver/toolchain dependencies required by Certora (Z3/CVC5/JDK/etc.)
 - One LLM backend:
   - OpenAI: `OPENAI_API_KEY`
+  - OpenRouter: `OPENROUTER_API_KEY`
   - Ollama: local server on `http://localhost:11434`
 
 Certora upstream:
